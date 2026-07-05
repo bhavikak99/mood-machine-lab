@@ -135,6 +135,31 @@ class MoodAnalyzer:
         #   2. Return "positive" if the score is above 0.
         #   3. Return "negative" if the score is below 0.
         #   4. Return "neutral" otherwise.
+
+        tokens = self.preprocess(text)
+
+        has_positive = False
+        has_negative = False
+        negation_words = {"not", "never", "no"}
+
+        for i, token in enumerate(tokens):
+            previous_token = tokens[i - 1] if i > 0 else ""
+
+            if token in self.positive_words:
+                if previous_token in negation_words:
+                    has_negative = True
+                else:
+                    has_positive = True
+
+            elif token in self.negative_words:
+                if previous_token in negation_words:
+                    has_positive = True
+                else:
+                    has_negative = True
+
+        if has_positive and has_negative:
+            return "mixed"
+
         score = self.score_text(text)
 
         if score > 0:
