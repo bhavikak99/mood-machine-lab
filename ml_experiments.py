@@ -15,6 +15,21 @@ from sklearn.metrics import accuracy_score
 
 from dataset import SAMPLE_POSTS, TRUE_LABELS
 
+TEST_POSTS = [
+    "Oh great, my laptop died again.",
+    "I passed the test, but barely.",
+    "That movie was fire.",
+    "I have class at noon.",
+    "I am not excited about this.",
+]
+
+TEST_LABELS = [
+    "negative",
+    "mixed",
+    "positive",
+    "neutral",
+    "negative",
+]
 
 def train_ml_model(
     texts: List[str],
@@ -130,7 +145,9 @@ if __name__ == "__main__":
 
     # Evaluate on the same dataset (training accuracy).
     evaluate_on_dataset(SAMPLE_POSTS, TRUE_LABELS, vectorizer, model)
-
+    print("\n=== ML Model Evaluation on New Test Posts ===")
+    evaluate_on_dataset(TEST_POSTS, TEST_LABELS, vectorizer, model)
+    
     # Let the user try their own examples.
     run_interactive_loop(vectorizer, model)
 
