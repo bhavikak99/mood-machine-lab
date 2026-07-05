@@ -1,4 +1,5 @@
 # mood_analyzer.py
+import string
 """
 Rule based mood analyzer for short text snippets.
 
@@ -53,8 +54,11 @@ class MoodAnalyzer:
           - Normalize repeated characters ("soooo" -> "soo")
         """
         cleaned = text.strip().lower()
-        tokens = cleaned.split()
 
+        for punctuation in string.punctuation:
+            cleaned = cleaned.replace(punctuation, "")
+
+        tokens = cleaned.split()
         return tokens
 
     # ---------------------------------------------------------------------
@@ -83,7 +87,28 @@ class MoodAnalyzer:
         #
         # Hint: if you implement negation, you may want to look at pairs of tokens,
         # like ("not", "happy") or ("never", "fun").
-        pass
+
+        tokens = self.preprocess(text)
+        score = 0
+
+        negation_words = {"not", "never", "no"}
+
+        for i, token in enumerate(tokens):
+            previous_token = tokens[i - 1] if i > 0 else ""
+
+            if token in self.positive_words:
+                if previous_token in negation_words:
+                    score -= 1
+                else:
+                    score += 1
+
+            elif token in self.negative_words:
+                if previous_token in negation_words:
+                    score += 1
+                else:
+                    score -= 1
+
+        return score
 
     # ---------------------------------------------------------------------
     # Label prediction
@@ -110,7 +135,14 @@ class MoodAnalyzer:
         #   2. Return "positive" if the score is above 0.
         #   3. Return "negative" if the score is below 0.
         #   4. Return "neutral" otherwise.
-        pass
+        score = self.score_text(text)
+
+        if score > 0:
+            return "positive"
+        elif score < 0:
+            return "negative"
+        else:
+            return "neutral"
 
     # ---------------------------------------------------------------------
     # Explanations (optional but recommended)
