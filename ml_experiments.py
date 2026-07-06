@@ -11,7 +11,7 @@ from typing import List, Tuple
 
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 
 from dataset import SAMPLE_POSTS, TRUE_LABELS
 
@@ -97,6 +97,31 @@ def evaluate_on_dataset(
     print(f"\nAccuracy on this dataset: {accuracy:.2f}")
     return accuracy
 
+def print_confusion_matrix(
+    texts: List[str],
+    labels: List[str],
+    vectorizer: CountVectorizer,
+    model: LogisticRegression,
+) -> None:
+    """
+    Print a confusion matrix for the ML model.
+    Rows are true labels, columns are predicted labels.
+    """
+    label_order = ["positive", "negative", "neutral", "mixed"]
+
+    X = vectorizer.transform(texts)
+    preds = model.predict(X)
+
+    matrix = confusion_matrix(labels, preds, labels=label_order)
+
+    print("\nConfusion Matrix")
+    print("Rows = true labels, Columns = predicted labels")
+    print("Labels:", label_order)
+
+    for label, row in zip(label_order, matrix):
+        print(f"{label}: {row}")
+
+
 
 def predict_single_text(
     text: str,
@@ -145,9 +170,11 @@ if __name__ == "__main__":
 
     # Evaluate on the same dataset (training accuracy).
     evaluate_on_dataset(SAMPLE_POSTS, TRUE_LABELS, vectorizer, model)
+    print_confusion_matrix(SAMPLE_POSTS, TRUE_LABELS, vectorizer, model)
     print("\n=== ML Model Evaluation on New Test Posts ===")
     evaluate_on_dataset(TEST_POSTS, TEST_LABELS, vectorizer, model)
-    
+    print_confusion_matrix(TEST_POSTS, TEST_LABELS, vectorizer, model)
+
     # Let the user try their own examples.
     run_interactive_loop(vectorizer, model)
 
